@@ -39,7 +39,7 @@ def process_is_exists(target:str)->bool:return target in (i.name() for i in proc
 def split(target:str,tstr:str)->str:
     new_chars=[]
     for i in tstr.lower().split():
-        if i.lower() !=target.lower():new_chars.append((i," "))
+        if i.lower() !=target.lower():new_chars.extend([i," "])
     return "".join(new_chars).rsplit(" ")[0]
 def connect()->None:
     global s
