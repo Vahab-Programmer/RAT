@@ -28,7 +28,7 @@ def process_is_double(target:str=argv[0])->bool:
                 if i.exe() == target:
                     process +=1
             except AccessDenied:pass
-        return (process >=2)
+        return (process >1)
     for i in process_iter():
         try:
             if i.name() == basename(target):exists=True
