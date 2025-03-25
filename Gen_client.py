@@ -1,6 +1,8 @@
 from subprocess import getoutput
 from os import system,environ
 from sys import exit
+__author__="Vahab Programmer https://Github.com/Vahab-Programmer"
+__version__="0.0.1"
 def nuitka()->None:
     ip_address=str(input("Server IP:"))
     with open("svchost.py","w") as file:
