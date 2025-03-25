@@ -2,6 +2,8 @@ from winreg import KEY_WRITE,SetValueEx,CloseKey,HKEY_CURRENT_USER,REG_SZ,OpenKe
 from argparse import ArgumentParser
 from os import system
 from sys import exit
+__author__="Vahab Programmer https://Github.com/Vahab-Programmer"
+__version__="0.0.1"
 def set_reg(addr,value)->None:
     CreateKey(HKEY_CURRENT_USER, addr)
     key = OpenKey(HKEY_CURRENT_USER, addr, 0, KEY_WRITE)
