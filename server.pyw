@@ -8,6 +8,8 @@ from zlib import compress,decompress
 from os.path import exists,dirname,join
 from ctypes import windll
 from time import sleep
+__author__="Vahab Programmer https://Github.com/Vahab-Programmer"
+__version__="0.0.1"
 commands_list = {}
 def save_commands()->None:
     data = dumps(commands_list)
