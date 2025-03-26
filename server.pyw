@@ -35,6 +35,8 @@ class RunServer(object):
         self.__handle=Thread(target=self.__handle_new_client)
         self.__bar_handle=Thread(target=self.__bar_motion)
         self.__gui()
+    @staticmethod
+    def __center(win:Tk)->None:win.update();win.geometry("+{}+{}".format((win.winfo_screenwidth()//2)-(win.winfo_width()//2),(win.winfo_screenheight()//2)-(win.winfo_height()//2)))
     def __close_command(self)->None:
         self.root.attributes("-disabled",0)
         self.croot.destroy()
@@ -111,7 +113,8 @@ class RunServer(object):
         self.croot = root
         root.title("Start New Process")
         root.resizable(False, False)
-        root.geometry("290x80+500+300")
+        root.geometry("290x80")
+        self.__center(root)
         root.protocol("WM_DELETE_WINDOW", self.__close_command)
         apppath = StringVar(root)
         Label(root, text="App Path").grid(row=0, column=0, pady=5)
@@ -212,7 +215,8 @@ class RunServer(object):
         self.croot = root
         root.title("Change Command")
         root.resizable(False, False)
-        root.geometry("300x110+500+300")
+        root.geometry("300x110")
+        self.__center(root)
         root.protocol("WM_DELETE_WINDOW", self.__close_command)
         label = StringVar(root)
         command = StringVar(root)
@@ -237,7 +241,8 @@ class RunServer(object):
         self.croot=root
         root.title("Add Command")
         root.resizable(False, False)
-        root.geometry("300x110+500+300")
+        root.geometry("300x110")
+        self.__center(root)
         root.protocol("WM_DELETE_WINDOW",self.__close_command)
         label = StringVar(root)
         command = StringVar(root)
@@ -289,7 +294,8 @@ class RunServer(object):
         self.croot=root
         root.title("Change Passwd")
         root.resizable(False, False)
-        root.geometry("300x70+500+300")
+        root.geometry("300x70")
+        self.__center(root)
         root.protocol("WM_DELETE_WINDOW",self.__close_command)
         passwd = StringVar(root)
         Label(root,text="Password").grid(row=0,column=0,pady=10)
@@ -317,7 +323,8 @@ class RunServer(object):
         root.iconbitmap(".\\icon.ico")
         self.root=root
         root.title("Server V1")
-        root.geometry("935x435+200+150")
+        root.geometry("935x435")
+        self.__center(root)
         root.resizable(False,False)
         root.protocol("WM_DELETE_WINDOW",self.__close)
         self.bar=StringVar(root)
